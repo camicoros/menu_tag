@@ -1,0 +1,11 @@
+<ul class="{% if active %}open{% endif %}">
+{% for item in menu_items %}
+    <li>
+        <a class="{% if item.current_active %}active{% endif %}" href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+        {{ item.children }}
+        {% with menu_items=item.children active=item.is_active %}
+            {% include 'menu/tags/menu.html' %}
+        {% endwith %}
+    </li>
+{% endfor %}
+</ul>
