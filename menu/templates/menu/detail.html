@@ -1,11 +1,5 @@
-{% load menu_tag %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    {% menu 'header_menu' %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ page }}</h1>
+{% endblock content %}

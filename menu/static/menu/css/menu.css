@@ -1,0 +1,20 @@
+.menu {
+    display: none;
+}
+
+.menu-opened {
+    display: block;
+}
+
+.link {
+    color: dodgerblue;
+    text-decoration: none;
+}
+
+.link:hover {
+    background-color: wheat;
+}
+
+.link-active {
+    color: orange;
+}

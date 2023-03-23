@@ -1,53 +1,37 @@
-from django import forms
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 
 from .models import Menu, MenuItemOrder, MenuItem
+from .forms import MenuItemOrderForm
 
 
 class MenuItemOrderInline(admin.TabularInline):
     model = MenuItemOrder
     extra = 0
+    form = MenuItemOrderForm
+    fields = ('level', 'menu_item', 'parent')
+    ordering = ('menu_position', )
+    readonly_fields = ('level', )
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super(MenuItemOrderInline, self).get_formset(request, obj=None, **kwargs)
+        if request._obj_ is not None:
+            formset.form.base_fields["parent"].queryset = MenuItemOrder.objects.filter(menu=request._obj_)
+        return formset
+
+    def level(self, obj):
+        return "{}{}".format("----" * obj.menu_position.count('-'), "----|")
 
 
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
     inlines = (MenuItemOrderInline,)
 
-
-class MenuItemForm(forms.ModelForm):
-    parent = forms.ModelChoiceField(
-        queryset=MenuItem.objects.all(),
-        widget=forms.Select,
-        required=False,
-        blank=True,
-    )
-
-    class Meta:
-        model = MenuItem
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['parent'].queryset = MenuItem.objects.exclude(id=self.instance.id)
-
-    def clean_parent(self):
-        def is_recursive(parent, depth):
-            max_depth = 10
-            if depth > max_depth or (self.instance.id is not None and (parent.id == self.instance.id)):
-                return True
-            elif parent.parent:
-                return is_recursive(parent.parent, depth+1)
-            return False
-
-        parent = self.cleaned_data.get('parent')
-        if parent and is_recursive(parent, 0):
-            raise ValidationError('Change parent! It\'s too recursive!')
-        return parent
+    def get_form(self, request, obj=None, **kwargs):
+        request._obj_ = obj
+        return super().get_form(request, obj, **kwargs)
 
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
     readonly_fields = ('slug', )
-    form = MenuItemForm
 

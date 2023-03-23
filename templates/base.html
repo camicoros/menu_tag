@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% load static %}
+{% load menu_tag %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block styles %}
+        <link rel="stylesheet" href="{% static 'menu/css/menu.css' %}">
+    {% endblock styles %}
+    <title>MENU APP</title>
+</head>
+<body>
+    {% menu 'Header' %}
+        {% block content %}{% endblock content %}
+    {% menu 'Footer' %}
+</body>
+</html>
